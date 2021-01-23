@@ -7,6 +7,7 @@ import * as uuid from 'uuid'
 
 const docClient = new AWS.DynamoDB.DocumentClient()
 const todosTable = process.env.TODOS_TABLE
+const bucketName = process.env.GENERATE_UPLOAD_URL
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   console.log('Processing event: ', event)
@@ -41,7 +42,7 @@ async function createTodo(todoId: string, event: any) {
     name,
     dueDate,
     done,
-    attachmentURl,
+    attachmentURl: `https://${bucketName}.s3.amazonaws.com/${todoId}`,
     todoId,
     ...newTodo,
   }
