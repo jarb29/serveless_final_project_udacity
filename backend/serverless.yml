@@ -14,6 +14,7 @@ provider:
 
   environment:
     TODOS_TABLE: TODOS-${self:provider.stage}
+    TODOS_TABLE_ITEM: IndexTable
 
   iamRoleStatements:
     - Effect: Allow
@@ -21,7 +22,12 @@ provider:
       - dynamodb:Scan
       - dynamodb:PutItem
       - dynamodb:GetItem
+      - dynamodb:Query
     Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
+    Action:
+      - dynamodb:Query
+    Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}/index/${self:provider.environment.TODOS_TABLE_ITEM:}
+
 
 functions:
 
@@ -34,7 +40,7 @@ functions:
     events:
       - http:
           method: get
-          path: todos
+          path: todos/{userId}
           cors: true
 
   # TODO: Configure this function
@@ -78,26 +84,35 @@ resources:
       Type: AWS::DynamoDB::Table
       Properties:
         AttributeDefinitions:
-          - AttributeName: partitionKey
+          - AttributeName: todoId
             AttributeType: S
-          - AttributeName: sortKey
+          - AttributeName: userId
             AttributeType: S
-          - AttributeName: indexKey
+          - AttributeName: createdAt
+            AttributeType: S
+          - AttributeName: dueDate
+            AttributeType: S
+          - AttributeName: name
+            AttributeType: S
+          - AttributeName: attachmentUrl
+            AttributeType: S
+          - AttributeName: done
+            AttributeType: b
+            - AttributeName: attachmentUrl
             AttributeType: S
         KeySchema:
-          - AttributeName: partitionKey
+          - AttributeName: userId
             KeyType: HASH
-          - AttributeName: sortKey
+          - AttributeName: createdAt
             KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
         TableName: ${self:provider.environment.TODOS_TABLE}
-        LocalSecondaryIndexes:
-          - IndexName: ${self:provider.environment.INDEX_NAME}
+        GlobalSecondaryIndexes:
+          - IndexName: ${self:provider.environment.TODOS_TABLE_ITEM}
             KeySchema:
-              - AttributeName: partitionKey
+              - AttributeName: todoId
                 KeyType: HASH
-              - AttributeName: indexKey
-                KeyType: RANGE
             Projection:
               ProjectionType: ALL # What attributes will be copied to an index
+
     
