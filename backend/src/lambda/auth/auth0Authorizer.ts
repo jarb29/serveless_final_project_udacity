@@ -12,7 +12,25 @@ const logger = createLogger('auth')
 // TODO: Provide a URL that can be used to download a certificate that can be used
 // to verify JWT token signature.
 // To get this URL you need to go to an Auth0 page -> Show Advanced Settings -> Endpoints -> JSON Web Key Set
-const jwksUrl = '...'
+const jwksUrl = `-----BEGIN CERTIFICATE-----
+MIIDDTCCAfWgAwIBAgIJaP2LBx1OWf5jMA0GCSqGSIb3DQEBCwUAMCQxIjAgBgNV
+BAMTGWRldi05NjV6ZGN6di51cy5hdXRoMC5jb20wHhcNMjEwMTIzMjMzMzMxWhcN
+MzQxMDAyMjMzMzMxWjAkMSIwIAYDVQQDExlkZXYtOTY1emRjenYudXMuYXV0aDAu
+Y29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAz7fwRIF4twJ6IFuO
+4eRJrPZeMrKYRfFSsO3+1wS98L/6xOtBpfufoHtlIDuWmZEp8MRUF7m3a46GOX/5
+Ub3QPwSDNmTvENqnJLPtuQlAPVQhp/w6mfnTmeY8W5CkgJRTxFRYyVsigTONafVn
+t4eBSrS6OzNng0RbZwNZ3iQ5pEoa1+cCwbiYT3EU0h4BhYRTW3uzpRiQ2/F+KQCp
+85XHk6XeTj3Ra/RBTkF5A3+d0GA/132SfP9i5QyxSQdIeYeLd0H7WEpcHZ2hbkmA
+1vg31gwTQGXEiCtbzYUHsqVMHLRNkor7pvfyiTN7m722VzDClUHJ6gV7SwReZVAG
+xdMjIQIDAQABo0IwQDAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBQWfDhsTaH2
+8REHo+K/zLikTOobtzAOBgNVHQ8BAf8EBAMCAoQwDQYJKoZIhvcNAQELBQADggEB
+AI3Kjw/tNOru+Ifzj2vBWODedKi32la0H2l9/Lj2LD9AVfVGreVGUs+c2RLxMftu
+6otGGERn1bLrpshOAa3smd60zVFDRlbRdghFOhXK8Dp3qPEKdj0bjoBuH0jzFvmR
+iGZN8i9PsO32kpUPeEE6D7FptgKX2moKBDeEYaYSkeMyEZjMzEPFaI1I5LfcBIQ4
++pZ9/lgvLRPgAx7kQKjFF2hysUWKd/gweSMi/h81tPayjxKx9Biq+pDXVPl18Rdo
+bzI/Dvipn0ktVayi8/MyQM8+TEpKLcWaO4O5D9IxnsTvxnUwzcvxdBUpalYiZW8S
+8NOSSWv01to82/6Fm45t4+I=
+-----END CERTIFICATE-----`
 
 export const handler = async (
   event: CustomAuthorizerEvent
@@ -54,14 +72,16 @@ export const handler = async (
   }
 }
 
-async function verifyToken(authHeader: string): Promise<JwtPayload> {
+function verifyToken(authHeader: string): JwtPayload {
   const token = getToken(authHeader)
-  const jwt: Jwt = decode(token, { complete: true }) as Jwt
+  // const jwt: Jwt = decode(token, { complete: true }) as Jwt
 
   // TODO: Implement token verification
   // You should implement it similarly to how it was implemented for the exercise for the lesson 5
   // You can read more about how to do this here: https://auth0.com/blog/navigating-rs256-and-jwks/
-  return undefined
+
+  return verify(token, jwksUrl, { algorithms: ['RS256'] }) as JwtPayload
+  
 }
 
 function getToken(authHeader: string): string {
