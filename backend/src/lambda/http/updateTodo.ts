@@ -2,7 +2,7 @@ import 'source-map-support/register'
 
 import { APIGatewayProxyEvent, APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda'
 
-import { updateTodo } from '../../businessLogic/todos'
+import { updateTodo } from '../../businessLogic/groups'
 import { UpdateTodoRequest } from '../../requests/UpdateTodoRequest'
 import { createLogger } from '../../utils/logger'
 import { getUserId } from '../utils'
@@ -10,7 +10,7 @@ import { getUserId } from '../utils'
 const logger = createLogger('updateTodo')
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-  logger.info('Processing updateTodo event', { event })
+  logger.info('Updating', { event })
 
   const userId = getUserId(event)
   const todoId = event.pathParameters.todoId
