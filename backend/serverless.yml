@@ -20,6 +20,27 @@ provider:
     TODOS_TABLE_ITEM: IndexTable
     GENERATE_UPLOAD_URL: generate-url-${self:provider.stage}
     SIGNED_URL_EXPIRATION: 300
+    
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Scan
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:GetItem
+        - dynamodb:DeleteItem
+        - dynamodb:Query
+      Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+      Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}/index/${self:provider.environment.TODOS_TABLE_ITEM:}
+    - Effect: Allow
+      Action:
+        - s3:PutObject
+      Resource: arn:aws:s3:::${self:provider.environment.GENERATE_UPLOAD_URL}/*
+
+
 
   tracing:
     lambda: true
@@ -37,26 +58,7 @@ functions:
           method: get
           path: todos
           cors: true
-          auth: Auth
-    iamRoleStatements:
-      - Effect: Allow
-        Action:
-          - dynamodb:Query
-        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}/index/${self:provider.environment.TODOS_TABLE_ITEM}
-      - Effect: Allow
-        Action:
-          - xray:GetSamplingRules
-          - xray:GetSamplingTargets
-          - xray:GetSamplingStatisticSummaries
-          - xray:BatchGetTraces
-          - xray:GetServiceGraph
-          - xray:GetTraceGraph
-          - xray:GetTraceSummaries
-          - xray:GetGroups
-          - xray:GetGroup
-          - xray:PutTraceSegments
-        Resource:
-          - "*"
+          authorizer: Auth
 
   CreateTodo:
     handler: src/lambda/http/createTodo.handler
@@ -65,26 +67,7 @@ functions:
           method: post
           path: todos
           cors: true
-          auth: Auth
-    iamRoleStatements:
-      - Effect: Allow
-        Action:
-          - dynamodb:PutItem
-        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
-      - Effect: Allow
-        Action:
-          - xray:GetSamplingRules
-          - xray:GetSamplingTargets
-          - xray:GetSamplingStatisticSummaries
-          - xray:BatchGetTraces
-          - xray:GetServiceGraph
-          - xray:GetTraceGraph
-          - xray:GetTraceSummaries
-          - xray:GetGroups
-          - xray:GetGroup
-          - xray:PutTraceSegments
-        Resource:
-          - "*"
+          authorizer: Auth
 
   UpdateTodo:
     handler: src/lambda/http/updateTodo.handler
@@ -93,27 +76,7 @@ functions:
           method: patch
           path: todos/{todoId}
           cors: true
-          auth: Auth
-    iamRoleStatements:
-      - Effect: Allow
-        Action:
-          - dynamodb:UpdateItem
-          - dynamodb:GetItem
-        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
-      - Effect: Allow
-        Action:
-          - xray:GetSamplingRules
-          - xray:GetSamplingTargets
-          - xray:GetSamplingStatisticSummaries
-          - xray:BatchGetTraces
-          - xray:GetServiceGraph
-          - xray:GetTraceGraph
-          - xray:GetTraceSummaries
-          - xray:GetGroups
-          - xray:GetGroup
-          - xray:PutTraceSegments
-        Resource:
-          - "*"
+          authorizer: Auth
 
   DeleteTodo:
     handler: src/lambda/http/deleteTodo.handler
@@ -122,28 +85,8 @@ functions:
           method: delete
           path: todos/{todoId}
           cors: true
-          auth: Auth
-    iamRoleStatements:
-      - Effect: Allow
-        Action:
-          - dynamodb:DeleteItem
-          - dynamodb:GetItem
-        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
-      - Effect: Allow
-        Action:
-          - xray:GetSamplingRules
-          - xray:GetSamplingTargets
-          - xray:GetSamplingStatisticSummaries
-          - xray:BatchGetTraces
-          - xray:GetServiceGraph
-          - xray:GetTraceGraph
-          - xray:GetTraceSummaries
-          - xray:GetGroups
-          - xray:GetGroup
-          - xray:PutTraceSegments
-        Resource:
-          - "*"
-
+          authorizer: Auth
+  
   GenerateUploadUrl:
     handler: src/lambda/http/generateUploadUrl.handler
     events:
@@ -151,31 +94,7 @@ functions:
           method: post
           path: todos/{todoId}/attachment
           cors: true
-          auth: Auth
-    iamRoleStatements:
-      - Effect: Allow
-        Action:
-          - s3:PutObject
-        Resource: arn:aws:s3:::${self:provider.environment.GENERATE_UPLOAD_URL}/*
-      - Effect: Allow
-        Action:
-          - dynamodb:UpdateItem
-          - dynamodb:GetItem
-        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
-      - Effect: Allow
-        Action:
-          - xray:GetSamplingRules
-          - xray:GetSamplingTargets
-          - xray:GetSamplingStatisticSummaries
-          - xray:BatchGetTraces
-          - xray:GetServiceGraph
-          - xray:GetTraceGraph
-          - xray:GetTraceSummaries
-          - xray:GetGroups
-          - xray:GetGroup
-          - xray:PutTraceSegments
-        Resource:
-          - "*"
+          authorizer: Auth
 
 resources:
   Resources:
