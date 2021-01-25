@@ -1,40 +1,32 @@
-import { APIGatewayProxyHandler, APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import 'source-map-support/register'
-import * as AWS  from 'aws-sdk'
 
-const s3 = new AWS.S3({
-  signatureVersion: 'v4'
-})
+import { APIGatewayProxyEvent, APIGatewayProxyResult, APIGatewayProxyHandler } from 'aws-lambda'
+import * as uuid from 'uuid'
 
+import { generateUploadUrl, updateAttachmentUrl } from '../../businessLogic/todos'
+import { createLogger } from '../../utils/logger'
+import { getUserId } from '../utils'
 
-const bucketName = process.env.GENERATE_UPLOAD_URL
-const urlExpiration = process.env.SIGNED_URL_EXPIRATION
-
+const logger = createLogger('generateUploadUrl')
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+  logger.info('Processing generateUploadUrl event', { event })
+
+  const userId = getUserId(event)
   const todoId = event.pathParameters.todoId
+  const attachmentId = uuid.v4()
 
-  // TODO: Return a presigned URL to upload a file for a TODO item with the provided id
+  const uploadUrl = await generateUploadUrl(attachmentId)
 
-
-  const url = getUploadUrl(todoId)
+  await updateAttachmentUrl(userId, todoId, attachmentId)
 
   return {
-    statusCode: 201,
+    statusCode: 200,
     headers: {
       'Access-Control-Allow-Origin': '*'
     },
     body: JSON.stringify({
-      uploadUrl: url
+      uploadUrl
     })
   }
-}
-
-
-function getUploadUrl(todoId: string) {
-  return s3.getSignedUrl('putObject', {
-    Bucket: bucketName,
-    Key: todoId,
-    Expires: urlExpiration
-  })
 }
