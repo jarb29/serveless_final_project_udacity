@@ -1,7 +1,6 @@
-import 'source-map-support/register'
-
 import * as AWS from 'aws-sdk'
 import { DocumentClient } from 'aws-sdk/clients/dynamodb'
+import 'source-map-support/register'
 import * as AWSXRay from 'aws-xray-sdk'
 
 import { TodoItem } from '../models/TodoItem'
@@ -12,17 +11,34 @@ const logger = createLogger('todosAccess')
 
 const XAWS = AWSXRay.captureAWS(AWS)
 
-export class TodosAccess {
+export class GroupAccess {
 
   constructor(
     private readonly docClient: DocumentClient = new XAWS.DynamoDB.DocumentClient(),
     private readonly todosTable = process.env.TODOS_TABLE,
-    private readonly todosByUserIndex = process.env.TODOS_TABLE_ITEM
+    private readonly todosIndex = process.env.TODOS_TABLE_ITEM,
+    private readonly s3 = new XAWS.S3({ signatureVersion: 'v4' }),
+    private readonly bucket = process.env.GENERATE_UPLOAD_URL,
+    private readonly urlExpiration = process.env.SIGNED_URL_EXPIRATION
   ) {}
 
   async todoItemExists(todoId: string): Promise<boolean> {
     const item = await this.getTodoItem(todoId)
     return !!item
+  }
+  
+  async getAttachmentUrl(attachId: string): Promise<string> {
+    const attachmentUrl = `https://${this.bucket}.s3.amazonaws.com/${attachId}`
+    return attachmentUrl
+  }
+  
+  async getUrl(attachId: string): Promise<string> {
+  const uploadUrl = this.s3.getSignedUrl('putObject', {
+    Bucket: this.bucket,
+    Key: attachId,
+    Expires: this.urlExpiration
+  })
+  return uploadUrl
   }
 
   async getTodoItems(userId: string): Promise<TodoItem[]> {
@@ -30,7 +46,7 @@ export class TodosAccess {
 
     const result = await this.docClient.query({
       TableName: this.todosTable,
-      IndexName: this.todosByUserIndex,
+      IndexName: this.todosIndex,
       KeyConditionExpression: 'userId = :userId',
       ExpressionAttributeValues: {
         ':userId': userId
@@ -45,7 +61,7 @@ export class TodosAccess {
   }
 
   async getTodoItem(todoId: string): Promise<TodoItem> {
-    logger.info(`Getting todo ${todoId} from ${this.todosTable}`)
+    logger.info(`Getting ${todoId} from ${this.todosTable}`)
 
     const result = await this.docClient.get({
       TableName: this.todosTable,
@@ -55,12 +71,11 @@ export class TodosAccess {
     }).promise()
 
     const item = result.Item
-
     return item as TodoItem
   }
-
-  async createTodoItem(todoItem: TodoItem) {
-    logger.info(`Putting todo ${todoItem.todoId} into ${this.todosTable}`)
+  
+  async createTodo(todoItem: TodoItem) {
+    logger.info(`adding ${todoItem.todoId} for ${this.todosTable}`)
 
     await this.docClient.put({
       TableName: this.todosTable,
@@ -88,7 +103,7 @@ export class TodosAccess {
     }).promise()   
   }
 
-  async deleteTodoItem(todoId: string) {
+  async deleteTodo(todoId: string) {
     logger.info(`Deleting todo item ${todoId} from ${this.todosTable}`)
 
     await this.docClient.delete({
@@ -112,6 +127,33 @@ export class TodosAccess {
         ':attachmentUrl': attachmentUrl
       }
     }).promise()
+  }
+
+  async ifUserExists(userId: string) {
+    const result = await this.docClient
+      .get({
+        TableName: this.todosTable,
+        Key: {
+          id: userId
+        }
+      })
+      .promise()
+  
+    console.log('Get group: ', result)
+    return !!result.Item
+  }
+
+  async getTodo(userId: string) {
+    const result = await this.docClient.query({
+      TableName: this.todosTable,
+      KeyConditionExpression: 'userId = :userId',
+      ExpressionAttributeValues: {
+        ':userId': userId
+      },
+      ScanIndexForward: false
+    }).promise()
+  
+    return result.Items as TodoItem[]
   }
 
 }
