@@ -8,6 +8,8 @@ export async function getTodos(idToken: string): Promise<Todo[]> {
   console.log('Fetching todos')
 
   console.log(idToken, "el token")
+  console.log(`${apiEndpoint}/todos`, "API ENDPOINT")
+
 
   const response = await Axios.get(`${apiEndpoint}/todos`, {
     
