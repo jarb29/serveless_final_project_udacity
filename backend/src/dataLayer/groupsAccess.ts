@@ -136,7 +136,7 @@ export class GroupAccess {
       .get({
         TableName: this.todosTable,
         Key: {
-          id: userId
+          userId: userId
         }
       })
       .promise()
