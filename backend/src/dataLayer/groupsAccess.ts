@@ -130,6 +130,8 @@ export class GroupAccess {
   }
 
   async ifUserExists(userId: string) {
+
+
     const result = await this.docClient
       .get({
         TableName: this.todosTable,
@@ -141,6 +143,8 @@ export class GroupAccess {
   
     console.log('Get group: ', result)
     return !!result.Item
+
+    
   }
 
   async getTodo(userId: string) {

@@ -95,6 +95,8 @@ export async function generatedUrl(attachtId: string): Promise<string> {
 export async function ifUserExists(userId: string): Promise<boolean> {
   logger.info(`knowing if User ${userId}, exist`)
   const userExist = await groupAccess.ifUserExists(userId)
+
+  logger.info(`Result after ${userExist}, ifuserexist`)
   return userExist
 }
 
