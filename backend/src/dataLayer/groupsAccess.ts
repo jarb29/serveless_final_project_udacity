@@ -131,18 +131,27 @@ export class GroupAccess {
 
   async ifUserExists(userId: string) {
 
+    const result = await this.docClient.query({
+      TableName: this.todosTable,
+      IndexName: this.todosIndex,
+      KeyConditionExpression: 'userId = :userId',
+      ExpressionAttributeValues: {
+        ':userId': userId
+      }
+    }).promise()
 
-    const result = await this.docClient
-      .get({
-        TableName: this.todosTable,
-        Key: {
-          userId: userId
-        }
-      })
-      .promise()
+
+    // const result = await this.docClient
+    //   .get({
+    //     TableName: this.todosTable,
+    //     Key: {
+    //       todoId: userId
+    //     }
+    //   })
+    //   .promise()
   
-    console.log('Get group: ', result)
-    return !!result.Item
+    console.log('Get group  PPPPPPPPPPPPPPPPP: ', !!result.Items)
+    return !!result.Items
     
   }
 

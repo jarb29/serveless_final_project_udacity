@@ -13,10 +13,8 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
   // const userId = event.pathParameters.userId
   const userId = getUserId(event)
 
-  console.log(userId, "the valid userID")
   const validuserId = await ifUserExists(userId)
 
-  console.log(validuserId, "the valid user")
 
   if (!validuserId) {
     return {
