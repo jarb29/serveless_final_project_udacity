@@ -143,7 +143,6 @@ export class GroupAccess {
   
     console.log('Get group: ', result)
     return !!result.Item
-
     
   }
 
