@@ -56,6 +56,8 @@ export async function deleteTodoItem(userId: string, todoId: string) {
 
   const item = await groupAccess.getTodoItem(todoId)
 
+  logger.info(`ITEMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM: ${item }`)
+
   if (!item)
     throw new Error(`${item} not found`) 
 

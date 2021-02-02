@@ -36,7 +36,7 @@ export class GroupAccess {
   const uploadUrl = this.s3.getSignedUrl('putObject', {
     Bucket: this.bucket,
     Key: attachId,
-    Expires: this.urlExpiration
+    Expires: parseInt(this.urlExpiration)
   })
   return uploadUrl
   }
@@ -66,13 +66,15 @@ export class GroupAccess {
     const result = await this.docClient.get({
       TableName: this.todosTable,
       Key: {
-        todoId
+        todoId: todoId
       }
     }).promise()
 
+    logger.info(`GettingGGGGGGGGGGGGGGGGGGGGGG ${todoId} from ${result.Item}`)
     const item = result.Item
     return item as TodoItem
   }
+
   
   async createTodo(todoItem: TodoItem) {
     logger.info(`adding ${todoItem.todoId} for ${this.todosTable}`)
@@ -109,7 +111,7 @@ export class GroupAccess {
     await this.docClient.delete({
       TableName: this.todosTable,
       Key: {
-        todoId
+        todoId: todoId
       }
     }).promise()    
   }
@@ -158,6 +160,7 @@ export class GroupAccess {
   async getTodo(userId: string) {
     const result = await this.docClient.query({
       TableName: this.todosTable,
+      IndexName: this.todosIndex,
       KeyConditionExpression: 'userId = :userId',
       ExpressionAttributeValues: {
         ':userId': userId

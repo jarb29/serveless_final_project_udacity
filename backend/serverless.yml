@@ -125,14 +125,14 @@ resources:
         KeySchema:
           - AttributeName: todoId
             KeyType: HASH
-          - AttributeName: createdAt
-            KeyType: RANGE
+          # - AttributeName: createdAt
+          #   KeyType: RANGE
         GlobalSecondaryIndexes:
           - IndexName: ${self:provider.environment.TODOS_TABLE_ITEM}
             KeySchema:
               - AttributeName: userId
                 KeyType: HASH
-              - AttributeName: todoId
+              - AttributeName: createdAt
                 KeyType: RANGE
             Projection:
               ProjectionType: ALL
