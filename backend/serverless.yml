@@ -53,9 +53,9 @@ provider:
         info:
           version: v1.0.0
           title: serverless-todo-app
-          description: Serverless application for todo items as udacity serverless projetc
+          description: Serverless application for todo items as udacity serverless p
       models:
-        - name: createTodo
+        - name: CreateTodos
           contentType: application/json
           schema: ${file(models/create-todo.json)}
         
@@ -79,7 +79,7 @@ functions:
             summary: Create a todo
             description: Create a todo
             requestModels:
-              'application/json': createTodo
+              'application/json': CreateTodos
 
   CreateTodo:
     handler: src/lambda/http/createTodo.handler
@@ -89,6 +89,12 @@ functions:
           path: todos
           cors: true
           authorizer: Auth
+          reqValidatorName: RequestBodyValidator
+          documentation:
+            summary: Create a new todo
+            description: Create a new todo
+            requestModels:
+              'application/json': CreateTodos
 
   UpdateTodo:
     handler: src/lambda/http/updateTodo.handler
