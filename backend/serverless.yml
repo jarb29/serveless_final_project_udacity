@@ -6,7 +6,6 @@ plugins:
   - serverless-iam-roles-per-function
   - serverless-reqvalidator-plugin
   - serverless-aws-documentation
-  - serverless-iam-roles-per-function
 
 
 provider:
@@ -40,12 +39,27 @@ provider:
       Action:
         - s3:PutObject
       Resource: arn:aws:s3:::${self:provider.environment.GENERATE_UPLOAD_URL}/*
-
-
-
+  
+      
   tracing:
     lambda: true
     apiGateway: true
+
+
+
+  custom:
+    documentation:
+      api:
+        info:
+          version: v1.0.0
+          title: serverless-todo-app
+          description: Serverless application for todo items as udacity serverless projetc
+      models:
+        - name: createTodo
+          contentType: application/json
+          schema: ${file(models/create-todo.json)}
+        
+
 
 functions:
 
@@ -60,6 +74,12 @@ functions:
           path: todos
           cors: true
           authorizer: Auth
+          reqValidatorName: RequestBodyValidator
+          documentation:
+            summary: Create a todo
+            description: Create a todo
+            requestModels:
+              'application/json': createTodo
 
   CreateTodo:
     handler: src/lambda/http/createTodo.handler
@@ -125,8 +145,6 @@ resources:
         KeySchema:
           - AttributeName: todoId
             KeyType: HASH
-          # - AttributeName: createdAt
-          #   KeyType: RANGE
         GlobalSecondaryIndexes:
           - IndexName: ${self:provider.environment.TODOS_TABLE_ITEM}
             KeySchema:
@@ -172,3 +190,13 @@ resources:
               Action: 's3:GetObject'
               Resource: 'arn:aws:s3:::${self:provider.environment.GENERATE_UPLOAD_URL}/*'
         Bucket: !Ref AttachmentsBucket
+    
+  # Request Validator
+    RequestBodyValidator:
+      Type: AWS::ApiGateway::RequestValidator
+      Properties:
+        Name: 'request-body-validator'
+        RestApiId:
+          Ref: ApiGatewayRestApi
+        ValidateRequestBody: true
+        ValidateRequestParameters: false

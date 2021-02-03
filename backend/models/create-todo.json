@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "group",
+  "type": "object",
+  "properties": {
+    "userId": {
+      "type": "string"
+    },
+    "todoId": {
+      "type": "string"
+    },
+    "done": {
+      "type": "string"
+    },
+    "createdAt": {
+      "type": "string"
+    },
+    "attachmentUrl": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "userId",
+    "todoId",
+    "done",
+    "createdAt",
+    "attachmentUrl"
+  ],
+  "additionalProperties": false
+}
+
