@@ -3,14 +3,12 @@
   "title": "todo",
   "type": "object",
   "properties": {
-    "todoItem": {
+    "name": {
       "type": "string"
     }
   },
   "required": [
-
-    "todoItem"
-
+    "name"
   ],
   "additionalProperties": false
 }
