@@ -70,7 +70,7 @@ export class GroupAccess {
       }
     }).promise()
 
-    logger.info(`GettingGGGGGGGGGGGGGGGGGGGGGG ${todoId} from ${result.Item}`)
+    logger.info(`Getting ${todoId} from ${result.Item}`)
     const item = result.Item
     return item as TodoItem
   }

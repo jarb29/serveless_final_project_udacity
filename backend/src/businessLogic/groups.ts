@@ -28,7 +28,7 @@ export async function createTodoItem(userId: string, createTodoRequest: CreateTo
     ...createTodoRequest
   }
 
-  logger.info(`The user ${userId}, creted the following ${todoId} `, { userId, todoId, todoItem: newTodoItem })
+  logger.info(`The user ${userId}, created the following ${todoId} `)
 
   await groupAccess.createTodo(newTodoItem)
 
