@@ -4,8 +4,8 @@ service:
 plugins:
   - serverless-webpack
   - serverless-iam-roles-per-function
-  - serverless-reqvalidator-plugin
-  - serverless-aws-documentation
+  # - serverless-reqvalidator-plugin
+  # - serverless-aws-documentation
 
 
 provider:
@@ -47,17 +47,17 @@ provider:
 
 
 
-  custom:
-    documentation:
-      api:
-        info:
-          version: v1.0.0
-          title: serverless-todo-app
-          description: Serverless application for todo items as udacity serverless p
-      models:
-        - name: CreateTodos
-          contentType: application/json
-          schema: ${file(models/create-todo.json)}
+# custom:
+#   documentation:
+#     api:
+#       info:
+#         version: v1.0.0
+#         title: serverless-todo-app
+#         description: Serverless application for todo items as udacity serverless p
+#     models:
+#       - name: CreateTodos
+#         contentType: application/json
+#         schema: ${file(models/create-todo.json)}
         
 
 
@@ -84,12 +84,16 @@ functions:
           path: todos
           cors: true
           authorizer: Auth
-          reqValidatorName: RequestBodyValidator
-          documentation:
-            summary: Create a new todo
-            description: Create a new todo
-            requestModels:
-              'application/json': CreateTodos
+          request:
+            schema:
+              application/json: ${file(models/create-todo.json)}
+
+          # reqValidatorName: RequestBodyValidator
+          # documentation:
+          #   summary: Create a new todo
+          #   description: Create a new todo
+          #   requestModels:
+          #     'application/json': CreateTodos
 
   UpdateTodo:
     handler: src/lambda/http/updateTodo.handler
@@ -193,11 +197,11 @@ resources:
         Bucket: !Ref AttachmentsBucket
     
   # Request Validator
-    RequestBodyValidator:
-      Type: AWS::ApiGateway::RequestValidator
-      Properties:
-        Name: 'request-body-validator'
-        RestApiId:
-          Ref: ApiGatewayRestApi
-        ValidateRequestBody: true
-        ValidateRequestParameters: false
+    # RequestBodyValidator:
+    #   Type: AWS::ApiGateway::RequestValidator
+    #   Properties:
+    #     Name: 'request-body-validator'
+    #     RestApiId:
+    #       Ref: ApiGatewayRestApi
+    #     ValidateRequestBody: true
+    #     ValidateRequestParameters: false
