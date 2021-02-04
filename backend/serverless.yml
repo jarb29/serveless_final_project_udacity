@@ -74,12 +74,7 @@ functions:
           path: todos
           cors: true
           authorizer: Auth
-          reqValidatorName: RequestBodyValidator
-          documentation:
-            summary: Create a todo
-            description: Create a todo
-            requestModels:
-              'application/json': CreateTodos
+
 
   CreateTodo:
     handler: src/lambda/http/createTodo.handler
