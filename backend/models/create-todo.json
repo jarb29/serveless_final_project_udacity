@@ -3,16 +3,36 @@
   "title": "todo",
   "type": "object",
   "properties": {
-    "name": {
-      "type": "string"
+    "TableName": {
+      "type":"string"
     },
-    "dueDate": {
-      "type": "string"
+    "Item": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type":"string",
+          "minLength": 3
+        },
+        "userId": {
+          "type":"string"
+        },
+        "todoId": {
+          "type":"string"
+        },
+        "createdAt": {
+          "type":"string"
+        }
+      },
+      "required": [
+        "name", "userId", "todoId", "createdAt"
+      ]
     }
   },
   "required": [
-    "name", "dueDate"
+    "Item", "TableName"
   ],
   "additionalProperties": false
 }
+
+
 

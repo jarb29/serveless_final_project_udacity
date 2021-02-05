@@ -19,6 +19,7 @@ export async function getTodos(userId: string): Promise<TodoItem[]> {
 
 export async function createTodoItem(userId: string, createTodoRequest: CreateTodoRequest): Promise<TodoItem> {
   const todoId = uuid.v4()
+
   const newTodoItem: TodoItem = {
     userId,
     todoId,
@@ -29,7 +30,7 @@ export async function createTodoItem(userId: string, createTodoRequest: CreateTo
   }
 
   logger.info(`The user ${userId}, created the following ${todoId} `, { userId, todoId, todoItem: newTodoItem })
-
+  logger.info(`i want to see what the fuck is this ${createTodoRequest}`)
   await groupAccess.createTodo(newTodoItem)
 
   return newTodoItem
