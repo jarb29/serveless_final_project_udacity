@@ -86,7 +86,7 @@ functions:
           authorizer: Auth
           request:
             schema:
-              application/json: ${file(models/create-todo.json)}
+              application/json: ${file(modelss/create-todo.json)}
 
           # reqValidatorName: RequestBodyValidator
           # documentation:
@@ -196,7 +196,7 @@ resources:
               Resource: 'arn:aws:s3:::${self:provider.environment.GENERATE_UPLOAD_URL}/*'
         Bucket: !Ref AttachmentsBucket
     
-  # Request Validator
+
     # RequestBodyValidator:
     #   Type: AWS::ApiGateway::RequestValidator
     #   Properties:
