@@ -86,7 +86,7 @@ functions:
           authorizer: Auth
           request:
             schema:
-              application/json: ${file(modelss/create-todo.json)}
+              application/json: ${file(models/create-todo.json)}
 
           # reqValidatorName: RequestBodyValidator
           # documentation:
